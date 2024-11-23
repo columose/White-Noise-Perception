@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequency Canvas</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <h1>White Noise experiment</h1>
+</head>
+<body>
+    <div class = "Play-repeated-noise-container">
+        <h2>Step 1</h2>
+        <h3>Press the play button to listen to repeated white noise.</h3>
+        <h3>Press the stop button once you have heard the repeat a few times.</h3>
+        <h3>You're welcome to replay the noise as many times as you like.</h3>
+        <button id="playButton">Play</button>
+        <button id="stopButton">Stop</button>
+    </div>
+    <div class = "Filtered-noise-canvas">
+        <h2>Step 2</h2>
+        <h3>Next, try to locate the repeat that you heard in the noise by filtering through time and frequency.</h3>
+        <h3>You can do this by moving and modifying the shape of the grey rectangle on the canvas below.</h3>
+        <h3>You can filter higher frequencies by moving the rectangle upwards, and listen to segments further in time by moving the box to the right.</h3>
+        <h3>Use the following keyboard controls to move and modify the spape of the box:</h3>
+        <h3>Move the position of the rectangle with the following arrows &#8593;&#8595;&#8592;&#8594; </h3>
+        <h3>Increase and decrease the height of the rectangle using 'h' and 'j' respectively.</h3> 
+        <h3>Increase the decrease the width of the rectangle using 'w' and 's' respectively.</h3>
+        <p class = "freq">Frequency (Hz)</p>
+        <p class = "time">Time(ms)</p>
+        <canvas id="filterCanvas" width="400" height="200"></canvas>
+    </div>
+    <div class = "Filtered-noise-container">
+        <h2>Step 3</h2>
+        <h3>Play the filtered output</h3>
+        <button id = "playFilteredButton">Play filtered noise</button>
+    </div>
+    <div class = "Confirmation-container">
+        <h2>Step 4</h2>
+        <h3>Press confirm if you heard the repeat in the filtered time-frequency segment</h3>
+        <button id = "confirmButton">Confirm</button>
+    </div>
+    <script type = "module" src = "JS scripts/white noise 1.js" defer></script>  
+</body>
+</html>
