@@ -3,12 +3,13 @@ import { fCreateNoiseSample } from "./functions/CreateNoise.js";
 import { fcreateBPFilter } from "./functions/BPFilter.js";
 import { fCopyBuffer } from "./functions/copyBuffer.js";
 import { fHannWin } from "./functions/HanningWindow.js";
+import { fMixNoise } from "./functions/mixNoise.js";
 
 // Declare global variables
 const ctxAudio = new(window.AudioContext || window.webkitAudioContext)();
-const duration = 1; // in seconds
+const duration = 0.5; // in seconds
 const minF = 20; //Hz
-const maxF = 10000;
+const maxF = 20000;
 const freqRange = maxF - minF;
 let curMaxF;
 let curMinF;
@@ -28,6 +29,7 @@ window.onload = () => {
     // Create source and noise so they can be accessed in later scopes
     let source;
     const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
+    const maskNoise = fCreateNoiseSample(ctxAudio,duration);
 
     // Play repeating noise
     playButton.onclick = () => {
@@ -53,10 +55,10 @@ window.onload = () => {
     });
 
     // Define rectangle properties before drawing
-    let rectWidth = 100; 
-    let rectHeight = 50;   
+    let rectWidth = 380; 
+    let rectHeight = 200;   
     let zeroX = 0;  // starting x position
-    let zeroY = filterCanvas.height - rectHeight; // Because top left is 0, canvas height is 200, and rec height is 50   
+    let zeroY = 0; // Because top left is 0, canvas height is 200, and rec height is 50   
 
     // Draw the rectangle
     function drawRectangle() {
@@ -77,7 +79,6 @@ window.onload = () => {
 
     // Keyboard controls
     document.addEventListener('keydown', (event) => {
-
         //adjust time in larger steps than frequency
         let freqChange = 1;
         let timeChange = 2;
@@ -136,8 +137,11 @@ window.onload = () => {
         noiseCopy = fCopyBuffer(ctxAudio,noise)
 
         //Apply hanning window to noise copy
-        let [hanNoise,fadeIdxs, lenFilt] = fHannWin(noiseCopy,startTimeIdx,endTimeIdx);
+        //let [hanNoise,fadeIdxs, lenFilt] = fHannWin(noiseCopy,startTimeIdx,endTimeIdx);
+        //let hanNoise = fHannWin(noiseCopy,startTimeIdx,endTimeIdx);
+        let maskedNoise = fMixNoise(noiseCopy,maskNoise,startTimeIdx,endTimeIdx);
 
+        /*
         // Log values to ensure that noise remains the same and that the copy is manipulated
         console.log('First 3 values of original noise array: '+ noise.getChannelData(0).slice(0,3));
         console.log('First 3 values of selected noise segment: ' + noise.getChannelData(0).slice(startTimeIdx,startTimeIdx+3))
@@ -145,17 +149,20 @@ window.onload = () => {
         console.log('First 3 values of hann at full amplitude: '+ hanNoise.getChannelData(0).slice(fadeIdxs[0]+(lenFilt/10),fadeIdxs[0]+(lenFilt/10)+3));
         console.log('Indices of where fades should begin: ' + fadeIdxs);
         console.log('Length of non-zero values in fitlered buffer:' + lenFilt);
+        */
 
         // Declare new source as source was terminated by stop butto
         source = ctxAudio.createBufferSource();
-        source.buffer = hanNoise;
-        source.loop = false; // no repeat this time
+        //source.buffer = hanNoise;
+        source.buffer = maskedNoise;
+        source.loop = true; // no repeat this time
         source.connect(ctxAudio.destination);
 
         // Create filter, connect to source and play source
         const filter = fcreateBPFilter(ctxAudio, curMinF, curMaxF);
         source.connect(filter).connect(ctxAudio.destination);
         source.start(ctxAudio.currentTime);
+        source.stop(ctxAudio.currentTime + duration * 2);
         playFiltBut.disabled = true;
         source.onended = () => {
             playFiltBut.disabled = false;
@@ -163,3 +170,7 @@ window.onload = () => {
         };
     });
 };
+
+
+
+

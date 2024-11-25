@@ -1,7 +1,21 @@
 // Fills samples before segment with zeros
 // Additionally, applies fade-in/out to samples that are 10% less than and greater than the segment window
 export function fHannWin(buffer, startIdx,endIdx){
-    let winData = buffer.getChannelData(0);
+    let winData = buffer.getChannelData(0)
+
+    for (let iSamp = 0; iSamp < buffer.length; iSamp++){
+        if(iSamp < startIdx || iSamp > endIdx){
+            winData[iSamp] = 0
+        }
+        else{
+            winData[iSamp]*=1
+        }
+    }
+    return buffer
+    
+    
+    
+    /*
     const length = endIdx - startIdx; //Because we're only interested in the selected segment
     const fadeWindow = Math.floor(length/10);
     const fadeIdxs = [Math.max(0,startIdx-fadeWindow),Math.min(buffer.length,endIdx+fadeWindow)] // ensure that fade indices exist in noise buffer
@@ -21,5 +35,6 @@ export function fHannWin(buffer, startIdx,endIdx){
         }
     }
     const newLen = winData.filter(element => element !== 0).length;
+    */
     return [buffer,fadeIdxs,newLen];
 }
