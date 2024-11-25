@@ -1,2 +1,3 @@
 # White-Noise-Perception
-Includes JavaScript, HTML and CSS scripts for my first project with ENS. Our objective is to understand whether people are biased towards specific frequencies when they perceive repetition in white noise.
+Includes JavaScript, HTML and CSS scripts for White Noise perception project. Immediate use for version control and sharing experiment through Github Pages.
+
