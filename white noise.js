@@ -23,7 +23,7 @@ window.onload = () => {
     const stopButton = document.getElementById('stopButton');
     const playFiltBut = document.getElementById('playFilteredButton')
     const filterCanvas = document.getElementById('filterCanvas');
-    const ctxCanvas = filterCanvas.getContext('2d');
+    const ctxRect = filterCanvas.getContext('2d');
 
     // Create source and noise so they can be accessed in later scopes
     let source;
@@ -54,17 +54,9 @@ window.onload = () => {
 
     // Define rectangle properties before drawing
     let rectWidth = 380; 
-    let rectHeight = 200;   
+    let rectHeight = 180;   
     let zeroX = 0;  // starting x position
-    let zeroY = 0; // Because top left is 0, canvas height is 200, and rec height is 50   
-
-    // Draw the rectangle
-    function drawRectangle() {
-        ctxCanvas.clearRect(0, 0, filterCanvas.width, filterCanvas.height); 
-        ctxCanvas.fillStyle = 'rgba(0, 0, 0, 0.3)'; 
-        ctxCanvas.fillRect(zeroX, zeroY, rectWidth, rectHeight); 
-    }
-    drawRectangle();
+    let zeroY = 0; // Because top left is 0, canvas height is 180, and rec height is 50   
 
     // Function to log coordinates of rectangle
     function updateCoords() {
@@ -75,13 +67,31 @@ window.onload = () => {
     }
     updateCoords()
 
+    // Draw the rectangle
+    function drawRectangle() {
+        ctxRect.clearRect(0, 0, filterCanvas.width, filterCanvas.height); 
+        ctxRect.fillStyle = 'rgba(0, 0, 0, 0.3)'; 
+        if (finalCoords.bottomRight.y > filterCanvas.height){
+            rectHeight = filterCanvas.height - finalCoords.topLeft.y;
+            ctxRect.fillRect(zeroX, zeroY, rectWidth, rectHeight);
+        }
+        else if (finalCoords.bottomRight.x > filterCanvas.width){
+            rectWidth = filterCanvas.width - finalCoords.topLeft.x;
+            ctxRect.fillRect(zeroX, zeroY, rectWidth, rectHeight);
+        }
+        else{
+            ctxRect.fillRect(zeroX, zeroY, rectWidth, rectHeight);
+        }
+    }
+    drawRectangle();
+
     // Keyboard controls
     document.addEventListener('keydown', (event) => {
 
         //adjust time in larger steps than frequency
         let freqChange = 1;
         let timeChange = 2;
-
+    
         //keyboard controls 
         switch (event.key) {
             case 'ArrowUp':
@@ -96,14 +106,12 @@ window.onload = () => {
             case 'ArrowRight':
                 zeroX = Math.min(filterCanvas.width - rectWidth, zeroX + timeChange);
                 break;
-   
             case 'w':
                 rectWidth += timeChange;  // Increase width
                 break;
             case 's':
                 rectWidth = Math.max(timeChange, rectWidth - timeChange);  // Decrease width
                 break;
-    
             case 'h':
                 rectHeight += freqChange;  // Increase height
                 break;
@@ -113,6 +121,7 @@ window.onload = () => {
             default:
                 return; 
         }
+            
         updateCoords(); //update coordinates after interaction so they can be used to calculate time-freq cut offs
         drawRectangle();
     });    
@@ -137,7 +146,10 @@ window.onload = () => {
 
         // Create a buffer that is a mix of repeated and non-repeated noise
         let repeats = 2;
-        let mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
+        const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
+
+        console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
+        console.log(noiseCopy.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
 
         // Declare new source as source was terminated by stop button
         source = ctxAudio.createBufferSource();
