@@ -8,7 +8,7 @@ import { fHannWin } from "./functions/HanningWindow.js";
 const ctxAudio = new(window.AudioContext || window.webkitAudioContext)();
 const duration = 1; // in seconds
 const minF = 20; //Hz
-const maxF = 10000;
+const maxF = 20000;
 const freqRange = maxF - minF;
 let curMaxF;
 let curMinF;
