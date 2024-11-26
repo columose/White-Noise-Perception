@@ -8,11 +8,11 @@
 export function fCreateNoiseSample(ctx,duration){
 
     //Define dimensions of audio buffer
-    let Chans = 1; 
+    let chans = 1; 
     let sampleRate = 44100;
     let length = sampleRate*duration; 
 
-    let buffer = ctx.createBuffer(Chans, length, sampleRate) // creates a buffer filled with zeros
+    let buffer = ctx.createBuffer(chans, length, sampleRate) // creates a buffer filled with zeros
     let data = buffer.getChannelData(0); //start at index 0, then loop through each point
 
     const min = -1; //for math.random
