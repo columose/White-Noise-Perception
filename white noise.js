@@ -71,6 +71,8 @@ window.onload = () => {
     function drawRectangle() {
         ctxRect.clearRect(0, 0, filterCanvas.width, filterCanvas.height); 
         ctxRect.fillStyle = 'rgba(0, 0, 0, 0.3)'; 
+
+        // Limit boundaries of rectangle to filter canvas boundaries
         if (finalCoords.bottomRight.y > filterCanvas.height){
             rectHeight = filterCanvas.height - finalCoords.topLeft.y;
             ctxRect.fillRect(zeroX, zeroY, rectWidth, rectHeight);
