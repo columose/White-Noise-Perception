@@ -132,8 +132,9 @@ window.onload = () => {
     playFiltBut.addEventListener("click", () => {
 
         //Translate rectangle height to frequency bearing in mind that frequency is scaled down
-        curMaxF = Math.abs((minF + (finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
-        curMinF = maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange); 
+        curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
+        curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
+        
         console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
 
         //Translate rectangle width to time segment (intuitive scaling)
