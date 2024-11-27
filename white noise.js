@@ -152,7 +152,7 @@ window.onload = () => {
         const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
 
         console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
-        console.log(noiseCopy.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
+        console.log(noiseCopy.getChannelData(0).slice(0,2))
 
         // Declare new source as source was terminated by stop button
         source = ctxAudio.createBufferSource();
