@@ -18,38 +18,25 @@ let endTimeIdx;
 
 window.onload = () => {
 
-    // Create buttons and canvas
-    const playButton = document.getElementById('playButton');
-    const stopButton = document.getElementById('stopButton');
-    const playFiltBut = document.getElementById('playFilteredButton')
+    // Create canvas
     const filterCanvas = document.getElementById('filterCanvas');
     const ctxRect = filterCanvas.getContext('2d');
 
-    // Create source and noise so they can be accessed in later scopes
+    // Create global variables so they can be accessed in later scopes
     let source;
+    let state;
     const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
 
-    // Play repeating noise
-    playButton.onclick = () => {
+    //Obtain Q factor for BP filer
+    let qSlider = document.getElementById("QRange");
+    let qInput = document.getElementById("qInput");
 
-        // Create the buffer source and connect to the filter chain
-        source = ctxAudio.createBufferSource();
-        source.buffer = noise;
-        source.loop = true; // Repeat the noise in a loop
-        source.connect(ctxAudio.destination); // Connect source to bandpass filter
-        source.start(ctxAudio.currentTime); // Start playing the noise
-        source.onended = () => {
-            playButton.disabled = false; // Re-enable button after playback
-        };
-        playButton.disabled = true; // Disable button during playback
-        stopButton.disabled = false;
-    };
-
-    // Stop repeating noise
-    stopButton.addEventListener("click", () => {
-        source.stop(ctxAudio.currentTime); 
-        playButton.disabled = false;
-        stopButton.disabled = true;
+    qSlider.addEventListener("input", () =>{
+        qInput.value = qSlider.value;
+    });
+    
+    qInput.addEventListener("input",() => {
+        qSlider.value = qInput.value;
     });
 
     // Define rectangle properties before drawing
@@ -86,7 +73,7 @@ window.onload = () => {
     drawRectangle();
 
     // Keyboard controls
-    document.addEventListener('keydown', (event) => {
+    document.onkeydown = (event) => {
 
         //adjust time in larger steps than frequency
         let freqChange = 1;
@@ -119,57 +106,80 @@ window.onload = () => {
                 rectHeight = Math.max(freqChange, rectHeight - freqChange);  // Decrease height
                 break;
             default:
-                return; 
+                break; 
         }
             
         updateCoords(); //update coordinates after interaction so they can be used to calculate time-freq cut offs
         drawRectangle();
-    });    
 
-    // Play filtered noise button - apply filter to noise using previously obtained values
-    playFiltBut.addEventListener("click", () => {
+        // Enable keyboard to handle events
+        if (event.key === "1"){
+            state = 'repeated noise';
+            console.log(state)
+        }
+        //play repeated noise
+        else if (state === 'repeated noise' && event.key === 'Enter'){
+            console.log('play repeated noise')
+            // Create the buffer source and connect to the filter chain
+            source = ctxAudio.createBufferSource();
+            source.buffer = noise;
+            source.loop = true; 
+            source.connect(ctxAudio.destination)
+            source.start(ctxAudio.currentTime); 
+        }
+        //stop noise
+        else if (state === 'repeated noise'  && event.key === 'Escape' || state === 'filtered noise' && event.key === 'Escape'){
+        console.log('stop noise')
+        source.stop(ctxAudio.currentTime); 
+        state = null;
+        }
+        // prepare filtered noise
+        else if (event.key === '2'){
+            state = 'filtered noise'
+            console.log(state)
+        }
+        // play filtered noise
+        else if (state === 'filtered noise' && event.key === 'Enter'){
+            console.log('play filtered noise')
+            //Translate rectangle height to frequency bearing in mind that frequency is scaled down
+            curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
+            curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
+            
+            console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
 
-        //Translate rectangle height to frequency bearing in mind that frequency is scaled down
-        curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
-        curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
-        
-        console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
+            //Translate rectangle width to time segment (intuitive scaling)
+            startTimeIdx = Math.floor((finalCoords.bottomLeft.x/filterCanvas.width)*noise.length);
+            endTimeIdx = Math.floor((finalCoords.bottomRight.x/filterCanvas.width)*noise.length);
+            console.log('start index at: ' + startTimeIdx,'end index at: ' + endTimeIdx); // Confirm time indices are correct
 
-        //Translate rectangle width to time segment (intuitive scaling)
-        startTimeIdx = Math.floor((finalCoords.bottomLeft.x/filterCanvas.width)*noise.length);
-        endTimeIdx = Math.floor((finalCoords.bottomRight.x/filterCanvas.width)*noise.length);
-        console.log('start index at: ' + startTimeIdx,'end index at: ' + endTimeIdx); // Confirm time indices are correct
+            // Copy noise source that can be manipultated without affecting original noise
+            let noiseCopy = {}; 
+            noiseCopy = fCopyBuffer(ctxAudio,noise)
 
+            // Create a buffer that is a mix of repeated and non-repeated noise
+            let repeats = 2;
+            const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
 
-        // Copy noise source that can be manipultated without affecting original noise
-        let noiseCopy = {}; 
-        noiseCopy = fCopyBuffer(ctxAudio,noise)
+            console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
+            console.log(noiseCopy.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
 
-        // Create a buffer that is a mix of repeated and non-repeated noise
-        let repeats = 2;
-        const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
+            // Declare new source as source was terminated by stop button
+            source = ctxAudio.createBufferSource();
+            source.buffer = mixedNoise;
+            source.loop = false; // no repeat this time
+            source.connect(ctxAudio.destination);
 
-        console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
-        console.log(noiseCopy.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
-
-        // Declare new source as source was terminated by stop button
-        source = ctxAudio.createBufferSource();
-        source.buffer = mixedNoise;
-        source.loop = false; // no repeat this time
-        source.connect(ctxAudio.destination);
-
-        // Create filter, connect to source and play source
-        const filter = fcreateBPFilter(ctxAudio, curMinF, curMaxF);
-        source.connect(filter).connect(ctxAudio.destination);
-        source.start(ctxAudio.currentTime);
-        playFiltBut.disabled = true;
-        source.onended = () => {
-            playFiltBut.disabled = false;
-            playButton.disabled = false;
-        };
-    });
+            // Create filter, connect to source and play source
+            let Q = qSlider.value;
+            const filter = fcreateBPFilter(ctxAudio, Q, curMinF, curMaxF);
+            source.connect(filter).connect(ctxAudio.destination);
+            source.start(ctxAudio.currentTime);
+            playFiltBut.disabled = true;
+            source.onended = () => {
+                playFiltBut.disabled = false;
+                playButton.disabled = false;
+            state = null;  
+            }
+        }
+    };  
 };
-
-
-
-

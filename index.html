@@ -10,11 +10,9 @@
 <body>
     <div class = "Play-repeated-noise-container">
         <h2>Step 1</h2>
-        <h3>Press the play button to listen to repeated white noise.</h3>
-        <h3>Press the stop button once you have heard the repeat a few times.</h3>
+        <h3>Press '1' and 'Enter' on your keyboard to play repeated noise.</h3>
+        <h3>Press 'Escape' once you have heard the repeat a few times.</h3>
         <h3>You're welcome to replay the noise as many times as you like.</h3>
-        <button id="playButton">Play</button>
-        <button id="stopButton">Stop</button>
     </div>
     <div class = "Filtered-noise-canvas">
         <h2>Step 2</h2>
@@ -28,10 +26,18 @@
         <p class = "freq">Frequency (Hz)</p>
         <p class = "time">Time(ms)</p>
         <canvas id="filterCanvas" width="400" height="200"></canvas>
+        <div class = "Qslidecontainer">
+            <input type = "range" min = "0" max = "1000" value = "10" step = "5" class = "slider" id = "QRange"/>
+            <label for "QRange">Q factor</label>
+            <div class = "Qbox">
+                <input class = "Q_val_box_input" type = "number" id = "qInput" value = "10" min = "0" max = "1000">
+                <div class = "Q_val_box">Value</div>
+            </div>
+        </div>
     </div>
     <div class = "Filtered-noise-container">
         <h2>Step 3</h2>
-        <h3>Press enter to play the filtered output</h3>
+        <h3>Press '2' and 'Enter' to hear the filtered output</h3>
         <button id = "playFilteredButton">Play filtered noise</button>
     </div> 
     <div class = "Confirmation-container">
