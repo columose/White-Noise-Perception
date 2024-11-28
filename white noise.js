@@ -78,40 +78,48 @@ window.onload = () => {
     document.onkeydown = (event) => {
 
         //adjust time in larger steps than frequency
-        let freqChange = 1;
-        let timeChange = 2;
-    
-        //keyboard controls 
-        switch (event.key) {
-            case 'ArrowUp':
-                zeroY = Math.max(0, zeroY - freqChange);
-                break;
-            case 'ArrowDown':
-                zeroY = Math.min(filterCanvas.height - rectHeight, zeroY + freqChange);
-                break;
-            case 'ArrowLeft':
-                zeroX = Math.max(0, zeroX - timeChange);
-                break;
-            case 'ArrowRight':
-                zeroX = Math.min(filterCanvas.width - rectWidth, zeroX + timeChange);
-                break;
-            case 'w':
-                rectWidth += timeChange;  // Increase width
-                break;
-            case 's':
-                rectWidth = Math.max(timeChange, rectWidth - timeChange);  // Decrease width
-                break;
-            case 'h':
-                rectHeight += freqChange;  // Increase height
-                break;
-            case 'j':
-                rectHeight = Math.max(freqChange, rectHeight - freqChange);  // Decrease height
-                break;
-            default:
-                break; 
+        let freqChange = 2;
+        let timeChange = 3;
+
+        // Change rectangle height
+        if (event.key === 'h'){
+            state = 'height'
+            console.log(state)
         }
-            
-        updateCoords(); //update coordinates after interaction so they can be used to calculate time-freq cut offs
+        else if (state === 'height' && event.key === '+'){
+            console.log('increase')
+            rectHeight += freqChange;
+        }
+        else if (state === 'height' && event.key === '-'){
+            console.log('decrease height')
+            rectHeight = Math.max(freqChange, rectHeight - freqChange);
+        }
+
+        // Change rectangle width
+        else if (event.key === 'w'){
+            state = 'width'
+        }
+        else if (state ==='width' && event.key === '+'){
+            rectWidth += timeChange;
+        }
+        else if (state === 'width' && event.key === '-'){
+            rectWidth = Math.max(timeChange, rectWidth - timeChange);
+        }
+        else if (event.key === 'ArrowUp'){
+            zeroY = Math.max(0, zeroY - freqChange);
+        }
+        else if (event.key === 'ArrowDown'){
+            zeroY = Math.min(filterCanvas.height - rectHeight, zeroY + freqChange);
+        }
+        else if (event.key === 'ArrowLeft'){
+            zeroX = Math.max(0, zeroX - timeChange);
+        }
+        else if (event.key === 'ArrowRight'){
+            zeroX = Math.min(filterCanvas.width - rectWidth, zeroX + timeChange);
+        }
+
+        //update coordinates after interaction so they can be used to calculate time-freq cut offs
+        updateCoords(); 
         drawRectangle();
 
         // Enable keyboard to handle events
@@ -178,12 +186,8 @@ window.onload = () => {
             const filter = fcreateBPFilter(ctxAudio, Q, curMinF, curMaxF);
             source.connect(filter).connect(ctxAudio.destination);
             source.start(ctxAudio.currentTime);
-            playFiltBut.disabled = true;
-            source.onended = () => {
-                playFiltBut.disabled = false;
-                playButton.disabled = false;
             state = null;  
-            }
+            
         }
-    };  
-};
+    }
+};  
