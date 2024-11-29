@@ -84,14 +84,11 @@ window.onload = () => {
         // Change rectangle height
         if (event.key === 'h'){
             state = 'height'
-            console.log(state)
         }
         else if (state === 'height' && event.key === '+'){
-            console.log('increase')
             rectHeight += freqChange;
         }
         else if (state === 'height' && event.key === '-'){
-            console.log('decrease height')
             rectHeight = Math.max(freqChange, rectHeight - freqChange);
         }
         // Change rectangle width
@@ -124,11 +121,9 @@ window.onload = () => {
         // Enable keyboard to handle events
         if (event.key === "1"){
             state = 'repeated noise';
-            console.log(state)
         }
         //play repeated noise
         else if (state === 'repeated noise' && event.key === 'Enter'){
-            console.log('play repeated noise')
             // Create the buffer source and connect to the filter chain
             source = ctxAudio.createBufferSource();
             source.buffer = noise;
@@ -141,18 +136,16 @@ window.onload = () => {
             state === 'filtered noise' && event.key === 'Escape' ||
             state === 'height' && event.key === 'Escape' ||
             state === 'width' && event.key === 'Escape'){
-            console.log('stop noise')
             source.stop(ctxAudio.currentTime); 
             state = null;
         }
         // prepare filtered noise
         else if (event.key === '2'){
             state = 'filtered noise'
-            console.log(state)
         }
         // play filtered noise
         else if (state === 'filtered noise' && event.key === 'Enter'){
-            console.log('play filtered noise')
+
             //Translate rectangle height to frequency bearing in mind that frequency is scaled down
             curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
             curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
@@ -171,11 +164,6 @@ window.onload = () => {
             // Create a buffer that is a mix of repeated and non-repeated noise
             let repeats = 2;
             const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
-
-        console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
-        console.log(noiseCopy.getChannelData(0).slice(0,2))
-            console.log(mixedNoise.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
-            console.log(noiseCopy.getChannelData(0).slice(startTimeIdx,startTimeIdx+2))
 
             // Declare new source as source was terminated by stop button
             source = ctxAudio.createBufferSource();
