@@ -82,14 +82,11 @@ window.onload = () => {
         // Change rectangle height
         if (event.key === 'h'){
             state = 'height'
-            console.log(state)
         }
         else if (state === 'height' && event.key === '+'){
-            console.log('increase')
             rectHeight += freqChange;
         }
         else if (state === 'height' && event.key === '-'){
-            console.log('decrease height')
             rectHeight = Math.max(freqChange, rectHeight - freqChange);
         }
         // Change rectangle width
@@ -122,11 +119,9 @@ window.onload = () => {
         // Enable keyboard to handle events
         if (event.key === "1"){
             state = 'repeated noise';
-            console.log(state)
         }
         //play repeated noise
         else if (state === 'repeated noise' && event.key === 'Enter'){
-            console.log('play repeated noise')
             // Create the buffer source and connect to the filter chain
             source = ctxAudio.createBufferSource();
             source.buffer = noise;
@@ -134,27 +129,24 @@ window.onload = () => {
             source.connect(ctxAudio.destination)
             source.start(ctxAudio.currentTime); 
         }
-        //stop noise
+        //stop noise from all possible states
         else if (state === 'repeated noise'  && event.key === 'Escape' || 
             state === 'filtered noise' && event.key === 'Escape' ||
             state === 'height' && event.key === 'Escape' ||
             state === 'width' && event.key === 'Escape'){
-            console.log('stop noise')
             source.stop(ctxAudio.currentTime); 
             state = null;
         }
         // prepare filtered noise
         else if (event.key === '2'){
             state = 'filtered noise'
-            console.log(state)
         }
         // play filtered noise
         else if (state === 'filtered noise' && event.key === 'Enter'){
-            console.log('play filtered noise')
+
             //Translate rectangle height to frequency bearing in mind that frequency is scaled down
             curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
             curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
-            
             console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
 
             //Translate rectangle width to time segment (intuitive scaling)
@@ -185,7 +177,6 @@ window.onload = () => {
             source.connect(filter).connect(ctxAudio.destination);
             source.start(ctxAudio.currentTime);
             state = null;  
-            
         }
     }
 };  

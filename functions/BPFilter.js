@@ -7,8 +7,6 @@ export function fcreateBPFilter (ctx,Q, low, high){
 
     //Define filter and cutoffs
     const centreFreq = Math.sqrt(low * high)
-    //const BW = higher - lower;
-    //const Q = (centreFreq/BW);
     filter.type = 'bandpass'
     filter.frequency.value = centreFreq;
     filter.Q.value = Q;
