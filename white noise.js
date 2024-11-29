@@ -94,7 +94,6 @@ window.onload = () => {
             console.log('decrease height')
             rectHeight = Math.max(freqChange, rectHeight - freqChange);
         }
-
         // Change rectangle width
         else if (event.key === 'w'){
             state = 'width'
@@ -138,10 +137,13 @@ window.onload = () => {
             source.start(ctxAudio.currentTime); 
         }
         //stop noise
-        else if (state === 'repeated noise'  && event.key === 'Escape' || state === 'filtered noise' && event.key === 'Escape'){
-        console.log('stop noise')
-        source.stop(ctxAudio.currentTime); 
-        state = null;
+        else if (state === 'repeated noise'  && event.key === 'Escape' || 
+            state === 'filtered noise' && event.key === 'Escape' ||
+            state === 'height' && event.key === 'Escape' ||
+            state === 'width' && event.key === 'Escape'){
+            console.log('stop noise')
+            source.stop(ctxAudio.currentTime); 
+            state = null;
         }
         // prepare filtered noise
         else if (event.key === '2'){
