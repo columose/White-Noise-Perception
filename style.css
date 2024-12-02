@@ -8,6 +8,11 @@ position:relative;
 top:10px;
 text-align: center;
 }
+
+h4{
+  font-size: large;
+  font-family: "Open Sans";
+}
 .Play-repeated-noise-container{
   position:absolute;
   top: 100px;
@@ -36,6 +41,49 @@ canvas {
   border:2px solid black;
 }
 
+.Repbox{
+  position:absolute;
+  top: 550px;
+  left:500px;
+}
+
+.Rep_box_input{
+  width:30px;
+}
+
+.Rep_box{
+  position:absolute;
+  top:2px;
+  left:45px;
+}
+
+.Qslidecontainer .slider{
+  position:absolute;
+  left:450px;
+  top:630px;
+  font-size: 20px;
+  transform:rotate(-90deg)
+}
+
+.Qslidecontainer label {
+  position: absolute;
+  top: 710px; /* Moves label up */
+  left: 500px; /* Moves label to the right */
+}
+
+.Qbox{
+  position:absolute;
+  left:560px;
+  top:710px;
+  font-size: 15px;
+  display:flex;
+  align-items: center;
+}
+
+.Q_val_box_input{
+  width:40px;
+}
+
 .freq{
   position: absolute; 
   top: 590px;
@@ -50,32 +98,6 @@ canvas {
   left:200px;
   top:250px;
   font-size: 20px;
-}
-
-.Qslidecontainer{
-  position:absolute;
-  left:200px;
-  top:500px;
-  font-size: 20px;
-}
-
-.Qbox{
-  position:absolute;
-  left:220px;
-  top:0px;
-  font-size: 15px;
-  display:flex;
-  align-items: center;
-}
-
-.Q_val_box_input{
-  width:40px;
-}
-
-.Q_val_box{
-  position:absolute;
-  top:2px;
-  left:55px;
 }
 
 .Filtered-noise-container{

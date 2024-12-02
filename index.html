@@ -10,7 +10,7 @@
 <body>
     <div class = "Play-repeated-noise-container">
         <h2>Step 1</h2>
-        <h3>Press '1' and 'Enter' on your keyboard to play repeated noise.</h3>
+        <h3>Press '1' on your keyboard to play repeated noise.</h3>
         <h3>Press 'Escape' once you have heard the repeat a few times.</h3>
         <h3>You're welcome to replay the noise as many times as you like.</h3>
     </div>
@@ -19,29 +19,33 @@
         <h3>Next, try to locate the repeat that you heard in the noise by filtering through time and frequency.</h3>
         <h3>You can do this by moving and modifying the shape of the grey rectangle on the canvas below.</h3>
         <h3>You can filter higher frequencies by moving the rectangle upwards, and listen to segments further in time by moving the box to the right.</h3>
-        <h3>Use the following keyboard controls to move and modify the spape of the box:</h3>
-        <h3>Move the position of the rectangle with the following arrows &#8593;&#8595;&#8592;&#8594; </h3>
-        <h3>Increase and decrease the height of the rectangle by pressing 'h' and using '+' and '-' respectively.</h3> 
-        <h3>Increase the decrease the width of the rectangle by pressing 'w' and using 'w' and 's' respectively.</h3>
+        <h4>Move the position of the rectangle with the following arrows &#8593;&#8595;&#8592;&#8594; </h3>
+        <h4>Increase the height of the rectangle using 'h'.</h3> 
+        <h4>Decrease the height of the rectangle using 'shift' and 'h'.</h3>
+        <h4>Increase the width of the rectangle using 'w'.</h3> 
+        <h4>Decrease the width of the rectangle using 'shift' and 'w'.</h3>
         <p class = "freq">Frequency (Hz)</p>
         <p class = "time">Time(ms)</p>
         <canvas id="filterCanvas" width="400" height="200"></canvas>
+        <div class = "Repbox">
+            <input class = "Rep_box_input" type = "number" id = "reps" value = "3" min = "1" max = "10">
+            <div class = "Rep_box">Repetitions</div>
+        </div>
         <div class = "Qslidecontainer">
             <input type = "range" min = "0" max = "1000" value = "10" step = "5" class = "slider" id = "QRange"/>
             <label for "QRange">Q factor</label>
             <div class = "Qbox">
                 <input class = "Q_val_box_input" type = "number" id = "qInput" value = "10" min = "0" max = "1000">
-                <div class = "Q_val_box">Value</div>
             </div>
         </div>
     </div>
     <div class = "Filtered-noise-container">
         <h2>Step 3</h2>
-        <h3>Press '2' and 'Enter' to hear the filtered output</h3>
+        <h3>Press '2' to hear the filtered output</h3>
     </div> 
     <div class = "Confirmation-container">
         <h2>Step 4</h2>
-        <h3>Press '3' and 'Enter' if you heard the repeat in the filtered time-frequency segment</h3>
+        <h3>Press '3' if you heard the repeat in the filtered time-frequency segment</h3>
     </div>
     <script type = "module" src = "white noise.js" defer></script>  
 </body>
