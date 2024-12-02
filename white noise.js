@@ -40,7 +40,6 @@ window.onload = () => {
         qSlider.value = qInput.value;
     });
     
-
     // Define rectangle properties before drawing
     let rectWidth = 380; 
     let rectHeight = 180;   
