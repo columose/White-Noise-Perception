@@ -87,11 +87,9 @@ window.onload = () => {
         // Handle events that are shifted 
         if (event.shiftKey && shifted === false){
             shifted = true;
-            console.log('shifted')
         }
         else if (event.shiftKey && shifted === true){
             shifted = false;
-            console.log('unshifted')
         }
             
         // Change rectangle height
