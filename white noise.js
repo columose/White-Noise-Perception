@@ -4,28 +4,29 @@ import { fcreateBPFilter } from "./functions/BPFilter.js";
 import { fCopyBuffer } from "./functions/copyBuffer.js";
 import { fMixNoise } from "./functions/mixNoise.js";
 
-// Declare global variables
+//// Declare global variables ////
 const ctxAudio = new(window.AudioContext || window.webkitAudioContext)();
 const duration = 0.5; // in seconds
-const minF = 20; //Hz
+const minF = 0; //Hz
 const maxF = 20000;
 const freqRange = maxF - minF;
+const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
+
+// let variables that can be modified based on user input
 let curMaxF;
 let curMinF;
 let finalCoords = {};
 let startTimeIdx;
 let endTimeIdx;
+let source;
+let state = null;
 
 window.onload = () => {
 
-    // Create canvas
+    // Event listners
     const filterCanvas = document.getElementById('filterCanvas');
     const ctxRect = filterCanvas.getContext('2d');
-
-    // Create global variables so they can be accessed in later scopes
-    let source;
-    let state;
-    const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
+    const repID = document.getElementById("reps");
 
     //Obtain Q factor for BP filer
     let qSlider = document.getElementById("QRange");
@@ -38,6 +39,7 @@ window.onload = () => {
     qInput.addEventListener("input",() => {
         qSlider.value = qInput.value;
     });
+    
 
     // Define rectangle properties before drawing
     let rectWidth = 380; 
@@ -73,6 +75,7 @@ window.onload = () => {
         }
     }
     drawRectangle();
+    let shifted = false;
 
     // Keyboard controls
     document.onkeydown = (event) => {
@@ -81,26 +84,32 @@ window.onload = () => {
         let freqChange = 2;
         let timeChange = 3;
 
-        // Change rectangle height
-        if (event.key === 'h'){
-            state = 'height'
+        // Handle events that are shifted 
+        if (event.shiftKey && shifted === false){
+            shifted = true;
+            console.log('shifted')
         }
-        else if (state === 'height' && event.key === '+'){
+        else if (event.shiftKey && shifted === true){
+            shifted = false;
+            console.log('unshifted')
+        }
+            
+        // Change rectangle height
+        if (event.key === 'h' && shifted === false){
             rectHeight += freqChange;
         }
         else if (state === 'height' && event.key === '-'){
+            console.log('decrease height')
             rectHeight = Math.max(freqChange, rectHeight - freqChange);
         }
         // Change rectangle width
-        else if (event.key === 'w'){
-            state = 'width'
-        }
-        else if (state ==='width' && event.key === '+'){
+        else if (event.key === 'w' && shifted === false){
             rectWidth += timeChange;
         }
-        else if (state === 'width' && event.key === '-'){
+        else if (event.key === 'w' && shifted === true){
             rectWidth = Math.max(timeChange, rectWidth - timeChange);
         }
+        // Move rectangle
         else if (event.key === 'ArrowUp'){
             zeroY = Math.max(0, zeroY - freqChange);
         }
@@ -118,38 +127,28 @@ window.onload = () => {
         updateCoords(); 
         drawRectangle();
 
-        // Enable keyboard to handle events
-        if (event.key === "1"){
-            state = 'repeated noise';
-        }
-        //play repeated noise
-        else if (state === 'repeated noise' && event.key === 'Enter'){
-            // Create the buffer source and connect to the filter chain
+        const states = ['repeated noise','filtered noise']; // define possible states
+        // Play repeated noise
+        if (state === null && event.key === "1"){
+            state = states[0]
+            // Create the buffer source and connect to the filter
             source = ctxAudio.createBufferSource();
             source.buffer = noise;
             source.loop = true; 
             source.connect(ctxAudio.destination)
-            source.start(ctxAudio.currentTime); 
+            source.start(ctxAudio.currentTime);
         }
-        //stop noise
-        else if (state === 'repeated noise'  && event.key === 'Escape' || 
-            state === 'filtered noise' && event.key === 'Escape' ||
-            state === 'height' && event.key === 'Escape' ||
-            state === 'width' && event.key === 'Escape'){
-            source.stop(ctxAudio.currentTime); 
+        //stop noise 
+        else if (states.includes(state) && event.key === 'Escape'){
+            source.stop(ctxAudio.currentTime);
             state = null;
         }
         // prepare filtered noise
-        else if (event.key === '2'){
-            state = 'filtered noise'
-        }
-        // play filtered noise
-        else if (state === 'filtered noise' && event.key === 'Enter'){
-
+        else if (state === null && event.key === '2'|| state === states[1] && event.key === '2'){
+            state = states[1];
             //Translate rectangle height to frequency bearing in mind that frequency is scaled down
             curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
             curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
-            
             console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
 
             //Translate rectangle width to time segment (intuitive scaling)
@@ -162,7 +161,7 @@ window.onload = () => {
             noiseCopy = fCopyBuffer(ctxAudio,noise)
 
             // Create a buffer that is a mix of repeated and non-repeated noise
-            let repeats = 2;
+            let repeats = repID.value;
             const mixedNoise = fMixNoise(ctxAudio,noiseCopy, repeats, startTimeIdx, endTimeIdx);
 
             // Declare new source as source was terminated by stop button
@@ -175,9 +174,11 @@ window.onload = () => {
             let Q = qSlider.value;
             const filter = fcreateBPFilter(ctxAudio, Q, curMinF, curMaxF);
             source.connect(filter).connect(ctxAudio.destination);
-            source.start(ctxAudio.currentTime);
-            state = null;  
-            
+            source.start(ctxAudio.currentTime); 
+            // crucially, once the source ends, reset the state to null to enable either repeated/filtered noise to play
+            source.onended = () =>{
+                state = null;
+            }
         }
     }
 };  
