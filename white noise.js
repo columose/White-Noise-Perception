@@ -88,7 +88,6 @@ window.onload = () => {
         else if (event.shiftKey && shifted === true){
             shifted = false;
         }
-            
         // Change rectangle height
         if (event.key === 'h' && shifted === false){
             rectHeight += freqChange;
