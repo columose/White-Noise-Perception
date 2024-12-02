@@ -94,8 +94,7 @@ window.onload = () => {
         if (event.key === 'h' && shifted === false){
             rectHeight += freqChange;
         }
-        else if (state === 'height' && event.key === '-'){
-            console.log('decrease height')
+        else if (state === 'height' && shifted === true){
             rectHeight = Math.max(freqChange, rectHeight - freqChange);
         }
         // Change rectangle width
@@ -118,7 +117,7 @@ window.onload = () => {
         else if (event.key === 'ArrowRight'){
             zeroX = Math.min(filterCanvas.width - rectWidth, zeroX + timeChange);
         }
-
+        
         //update coordinates after interaction so they can be used to calculate time-freq cut offs
         updateCoords(); 
         drawRectangle();
