@@ -31,12 +31,12 @@
             <input class = "Rep_box_input" type = "number" id = "reps" value = "3" min = "1" max = "10">
             <div class = "Rep_box">Repetitions</div>
         </div>
-        <div class = "Qslidecontainer">
-            <input type = "range" min = "0" max = "1000" value = "10" step = "5" class = "slider" id = "QRange"/>
-            <label for "QRange">Q factor</label>
-            <div class = "Qbox">
-                <input class = "Q_val_box_input" type = "number" id = "qInput" value = "10" min = "0" max = "1000">
-            </div>
+        <div class = "Filter-containter">
+            <p class="filter-vars">Filter Variables</p>
+            <p>Current State: <span id = "filter_state"></span></p>
+            <p>Q Value: <span id="qValue">1</span></p>
+            <p>Centre Frequency: <span id="CF">1</span></p>
+            <p>Bandwidth: <span id="BW">1</span></p>
         </div>
     </div>
     <div class = "Filtered-noise-container">
