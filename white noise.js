@@ -13,11 +13,9 @@ const freqRange = maxF - minF;
 const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
 
 // let variables that can be modified based on user input
-let curMaxF;
-let curMinF;
+let curMaxF, curMinF, CF, BW, Q;
 let finalCoords = {};
-let startTimeIdx;
-let endTimeIdx;
+let startTimeIdx,endTimeIdx;
 let source;
 let state = null;
 
@@ -27,18 +25,6 @@ window.onload = () => {
     const filterCanvas = document.getElementById('filterCanvas');
     const ctxRect = filterCanvas.getContext('2d');
     const repID = document.getElementById("reps");
-
-    //Obtain Q factor for BP filer
-    let qSlider = document.getElementById("QRange");
-    let qInput = document.getElementById("qInput");
-
-    qSlider.addEventListener("input", () =>{
-        qInput.value = qSlider.value;
-    });
-    
-    qInput.addEventListener("input",() => {
-        qSlider.value = qInput.value;
-    });
     
     // Define rectangle properties before drawing
     let rectWidth = 380; 
@@ -74,6 +60,26 @@ window.onload = () => {
         }
     }
     drawRectangle();
+
+    // Function to calculate Q, CF and BW from rectangle coordinates for web display
+    function calcFiltVars(){
+
+        //Translate rectangle height to frequency bearing in mind that frequency is scaled down
+        curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
+        curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 0Hz
+
+        BW = Math.round(curMaxF - curMinF);
+        CF = Math.round((curMaxF + curMinF)/2);
+        Q = (CF/BW).toFixed(2);
+        
+        document.getElementById("filter_state").textContent = 'Active';
+        document.getElementById("BW").textContent = BW;
+        document.getElementById("qValue").textContent = Q;  
+        document.getElementById("CF").textContent = CF;
+    }
+    calcFiltVars() //plot on webpage
+
+    // initiate shifted variable before keydown
     let shifted = false;
 
     // Keyboard controls
@@ -139,17 +145,12 @@ window.onload = () => {
             state = null;
         }
         // prepare filtered noise
-        else if (state === null && event.key === '2'|| state === states[1] && event.key === '2'){
+        else if (state === null && event.key === '2'){
             state = states[1];
-            //Translate rectangle height to frequency bearing in mind that frequency is scaled down
-            curMaxF = Math.abs(((finalCoords.topLeft.y/filterCanvas.height)*freqRange) - maxF);
-            curMinF = Math.max(minF,maxF - (minF + (finalCoords.bottomLeft.y/filterCanvas.height)*freqRange)); // ensure minimum freq is 20Hz
-            console.log('low cut off at: ' + curMinF,'high cut off at: ' + curMaxF); // Confirm filter values are correct
 
             //Translate rectangle width to time segment (intuitive scaling)
             startTimeIdx = Math.floor((finalCoords.bottomLeft.x/filterCanvas.width)*noise.length);
             endTimeIdx = Math.floor((finalCoords.bottomRight.x/filterCanvas.width)*noise.length);
-            console.log('start index at: ' + startTimeIdx,'end index at: ' + endTimeIdx); // Confirm time indices are correct
 
             // Copy noise source that can be manipultated without affecting original noise
             let noiseCopy = {}; 
@@ -166,13 +167,26 @@ window.onload = () => {
             source.connect(ctxAudio.destination);
 
             // Create filter, connect to source and play source
-            let Q = qSlider.value;
-            const filter = fcreateBPFilter(ctxAudio, Q, curMinF, curMaxF);
-            source.connect(filter).connect(ctxAudio.destination);
-            source.start(ctxAudio.currentTime); 
-            // crucially, once the source ends, reset the state to null to enable either repeated/filtered noise to play
-            source.onended = () =>{
-                state = null;
+            calcFiltVars() 
+            // add check in case filter should not be used at all
+            if (CF === (maxF/2) && BW === maxF){
+                document.getElementById("filter_state").textContent = 'Inactive';
+                document.getElementById("BW").textContent = 'N/A';
+                document.getElementById("qValue").textContent = 'N/A';  
+                document.getElementById("CF").textContent = 'N/A';
+                source.start(ctxAudio.currentTime)
+                // return to a state of null so other sources can be played
+                source.onended = () =>{
+                    state = null;
+                }
+            }
+            else{
+                const filter = fcreateBPFilter(ctxAudio, curMinF, curMaxF);
+                source.connect(filter).connect(ctxAudio.destination);
+                source.start(ctxAudio.currentTime); 
+                source.onended = () =>{
+                    state = null;
+                }
             }
         }
     }

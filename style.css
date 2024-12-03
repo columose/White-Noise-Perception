@@ -57,36 +57,19 @@ canvas {
   left:45px;
 }
 
-.Qslidecontainer .slider{
+.Filter-containter{
   position:absolute;
-  left:450px;
-  top:630px;
-  font-size: 20px;
-  transform:rotate(-90deg)
+  left:500px;
+  top:570px;
 }
 
-.Qslidecontainer label {
-  position: absolute;
-  top: 710px; /* Moves label up */
-  left: 500px; /* Moves label to the right */
-}
-
-.Qbox{
-  position:absolute;
-  left:560px;
-  top:710px;
-  font-size: 15px;
-  display:flex;
-  align-items: center;
-}
-
-.Q_val_box_input{
-  width:40px;
+.filter-vars {
+  font-weight: bold;
 }
 
 .freq{
   position: absolute; 
-  top: 590px;
+  top: 600px;
   left: -10px; 
   transform: rotate(-90deg) translateY(50%);
   background: rgb(255, 255, 255); 
