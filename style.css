@@ -43,7 +43,7 @@ canvas {
 
 .Repbox{
   position:absolute;
-  top: 550px;
+  top: 525px;
   left:500px;
 }
 
@@ -60,7 +60,7 @@ canvas {
 .Filter-containter{
   position:absolute;
   left:500px;
-  top:570px;
+  top:550px;
 }
 
 .filter-vars {
