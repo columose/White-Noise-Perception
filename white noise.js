@@ -167,7 +167,7 @@ window.onload = () => {
             // Create filter, connect to source and play source
             calcFiltVars() 
             // add check in case filter should not be used at all
-            if (CF === (maxF/2) && BW === maxF){
+            if (CF === (maxF/2) && BW === maxF){8
                 document.getElementById("filter_state").textContent = 'Inactive';
                 document.getElementById("BW").textContent = 'N/A';
                 document.getElementById("qValue").textContent = 'N/A';  
@@ -183,7 +183,7 @@ window.onload = () => {
                 source.connect(filter).connect(ctxAudio.destination);
                 source.start(ctxAudio.currentTime); 
                 source.onended = () =>{
-                    state = null;
+                    state = null
                 }
             }
         }
