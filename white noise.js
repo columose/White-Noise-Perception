@@ -10,6 +10,7 @@ const duration = 0.5; // in seconds
 const minF = 0; //Hz
 const maxF = 20000;
 const freqRange = maxF - minF;
+const qScaleFact = 10;
 const noise = fCreateNoiseSample(ctxAudio, duration); // Noise buffer
 
 // let variables that can be modified based on user input
@@ -68,8 +69,8 @@ window.onload = () => {
 
         BW = Math.round(curMaxF - curMinF);
         CF = Math.round((curMaxF + curMinF)/2);
-        Q = (CF/BW).toFixed(2);
-        
+        Q = (CF/BW).toFixed(2)*qScaleFact;
+
         document.getElementById("filter_state").textContent = 'Active';
         document.getElementById("BW").textContent = BW;
         document.getElementById("qValue").textContent = Q;  
@@ -167,7 +168,7 @@ window.onload = () => {
             // Create filter, connect to source and play source
             calcFiltVars() 
             // add check in case filter should not be used at all
-            if (CF === (maxF/2) && BW === maxF){8
+            if (CF === (maxF/2) && BW === maxF){
                 document.getElementById("filter_state").textContent = 'Inactive';
                 document.getElementById("BW").textContent = 'N/A';
                 document.getElementById("qValue").textContent = 'N/A';  
@@ -179,10 +180,21 @@ window.onload = () => {
                 }
             }
             else{
-                const filter = fcreateBPFilter(ctxAudio, curMinF, curMaxF);
+
+                const filter = fcreateBPFilter(ctxAudio, curMinF, curMaxF, qScaleFact);
                 source.connect(filter).connect(ctxAudio.destination);
+
+                //add sine wave as well
+                const osc = ctxAudio.createOscillator();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(1000, ctxAudio.currentTime); //in Hz
+                osc.connect(filter);
+
+
                 source.start(ctxAudio.currentTime); 
+                osc.start(ctxAudio.currentTime);
                 source.onended = () =>{
+                    osc.stop(ctxAudio.currentTime); // Stop oscillator
                     state = null
                 }
             }
